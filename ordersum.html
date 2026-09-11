@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #000069;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #000069;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        button {
+            padding: 10px 16px;
+            background-color: #000069;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #cf2e2e;
+        }
+
+        form select, input[type="text"], input[type="number"] {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        form select {
+            width: auto;
+            padding: 6px 10px;
+        }
+
+        #checkout {
+            width: 100%;
+            background-color: #cf2e2e;
+        }
+
+        #checkout:hover {
+            background-color: #000069;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            background-color: #000069;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        a:hover {
+            background-color: #cf2e2e;
+        }
+
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Your Cart</h1>
+
+    {% if pending_orders %}
+    <table>
+        <thead>
+            <tr>
+                <th>Store</th>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total Price</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in pending_orders %}
+            {% set amount = order['price'] * order['quantity'] %}
+                <tr>
+                    <td>{{ order['storename'] }}</td>
+                    <td>{{ order['item'] }}</td>
+                    <td>{{ order['quantity'] }}</td>
+                    <td>£{{ order['price'] }}</td>
+                    <td>£{{ amount }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_order') }}">
+                            <input type="hidden" name="item" value="{{ order['item'] }}">
+                            <input type="hidden" name="storeid" value="{{ order['storeid'] }}">
+                            <input type="hidden" name="fname" value="{{ fname }}">
+                            <input type="hidden" name="userid" value="{{ userid }}">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h1>Order Summary</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Amount</th>
+                <th>Tram fee</th>
+                <th>Delivery fee</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set tram_fee = 5.30 %}
+            {% set delivery_fee = 2.00 %}
+            <tr>
+                <td>£{{ ordertotal }}</td>
+                <td>£{{ tram_fee }}</td>
+                <td>£{{ delivery_fee }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Total to pay</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>£{{ ordertotal + tram_fee + delivery_fee | round(2)}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br>
+    <div id="order-details">
+        <!-- Order details dynamically inserted here -->
+    </div>
+    <form method="POST" action="/checkout">
+        
+        <label for="house">Choose house to deliver to:</label>
+        <select name="house" id="house" required>
+            <option value="dragon">Dragon</option>
+            <option value="dolphin">Dolphin</option>
+            <option value="mc">Maltese Cross</option>
+            <option value="mf">Mitre Fleur De Lys</option>
+            <option value="peli">Pelican</option>
+            <option value="rose">Rose</option>
+            <option value="se">Spread Eagle</option>
+            <option value="wren">Wren</option>
+        </select>
+        <p>Enter description (any toppings or details to mention), enter amount if topping requires extra:</p>
+
+        <label for="extradesc">Extra Description:</label>
+        <input type="text" id="extradesc" name="extradesc"><br><br>
+
+        <label for="extracost">Extra Cost:</label>
+        <p>£</p><input type="number" id="extracost" name="extracost"><br><br>
+
+        
+
+        <form action="{{ url_for('create_checkout_session') }}" method="POST" id="payment-form">
+            <input type="hidden" name="ordertotal" value="{{ ordertotal + tram_fee + delivery_fee }}">
+            <input type="hidden" name="fname" value="{{ fname }}">
+            <input type="hidden" name="userid" value="{{ userid }}">
+            <button type="submit" value="checkout">Pay & Submit</button>
+        </form>
+    </form>
+   
+
+    <br>
+
+    
+    
+    
+
+    {% else %}
+        <p>No pending orders.</p>
+    {% endif %}
+
+    <br>
+    <a href="{{ url_for('homepage', enc_fname=encode_to_base64(fname), enc_userid=encode_to_base64(userid)) }}">Back to Homepage</a>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const paymentForm = document.getElementById('payment-form');
+    
+        paymentForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+    
+            // Send a POST request to the server to create a Checkout Session
+            const formData = new FormData(paymentForm);
+            const response = await fetch(paymentForm.action, {
+                method: 'POST',
+                body: new URLSearchParams(formData)
+            });
+    
+            const session = await response.json();
+    
+            if (session.url) {
+                // Redirect the user to Stripe's hosted payment page
+                window.location.href = session.url;
+            } else {
+                // Handle errors from the server
+                alert(session.error);
+            }
+        });
+
+    </script>
+    
+    
+    
+    <footer>
+        <p>© 2024 Your Food Delivery Service</p>
+    </footer>
+
+</body>
+</html>

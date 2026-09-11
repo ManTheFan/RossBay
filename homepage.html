@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Homepage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #040a75, #000069);
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+            font-size: 36px;
+            color: #cf2e2e;
+        }
+
+        p {
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .dropbtn, .dropbtn1 {
+            background-color: white;
+            color: #000069;
+            padding: 16px 20px;
+            font-size: 16px;
+            border: 2px solid #000069;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dropdown, .dropdown1 {
+            display: inline-block;
+            margin: 20px;
+        }
+
+        .dropdown-content, .dropdown-content1 {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+            min-width: 180px;
+        }
+
+        .dropdown-content a, .dropdown-content1 a {
+            color: #000069;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border-radius: 6px;
+        }
+
+        .dropdown-content a:hover, .dropdown-content1 a:hover {
+            background-color: #ddd;
+        }
+
+        .dropdown:hover .dropdown-content, .dropdown1:hover .dropdown-content1 {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn, .dropdown1:hover .dropbtn1 {
+            color: #cf2e2e;
+            background-color: white;
+            border-color: #cf2e2e;
+        }
+
+        a {
+            color: #cf2e2e;
+            font-size: 18px;
+            margin-top: 20px;
+            display: inline-block;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            background-color: white;
+            border: 2px solid #000069;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        a:hover {
+            background-color: #cf2e2e;
+            color: white;
+        }
+
+        iframe {
+            margin-top: 40px;
+            border: 2px solid #000069;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 600px;
+            height: 400px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        footer {
+            margin-top: 50px;
+            font-size: 16px;
+            color: #bbb;
+        }
+
+        .btn {
+            display: inline-block;
+            margin: 20px;
+            padding: 12px 20px;
+            background-color: white;
+            color: #000069;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            border: 2px solid #000069;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #cf2e2e;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome, {{ fname }}</h1>
+    <p>Your user ID is: {{ userid }}</p>
+
+    <!-- Fleetwood Dropdown -->
+    <div class="dropdown">
+        <button class="dropbtn">Stores in Fleetwood</button>
+        <div class="dropdown-content">
+            <a href="{{ url_for('order', enc_fname=encode_to_base64(fname), enc_userid=encode_to_base64(userid), storeid='5') }}">Asda</a>
+            <a href="{{ url_for('order', enc_fname=encode_to_base64(fname), enc_userid=encode_to_base64(userid), storeid='3') }}">McDonald's</a>
+            <a href="{{ url_for('order', enc_fname=encode_to_base64(fname), enc_userid=encode_to_base64(userid), storeid='6') }}">Aldi</a>
+        </div>
+    </div>
+
+    <!-- Cleveleys Dropdown -->
+    <div class="dropdown">
+        <button class="dropbtn">Stores in Cleveleys</button>
+        <div class="dropdown-content">
+            <a href="{{ url_for('order', enc_fname=encode_to_base64(fname), enc_userid=encode_to_base64(userid), storeid='1') }}">KFC</a>
+            <a href="{{ url_for('order', enc_fname=encode_to_base64(fname), enc_userid=encode_to_base64(userid), storeid='2') }}">Nitros</a>
+            <a href="{{ url_for('order', enc_fname=encode_to_base64(fname), enc_userid=encode_to_base64(userid), storeid='4') }}">Subway</a>
+        </div>
+    </div>
+
+    <a href="{{ url_for('ordersum', enc_fname=encode_to_base64(fname), enc_userid=encode_to_base64(userid)) }}">Your pending orders</a>
+
+    <br>
+    <iframe src="{{ url_for('listedorder') }}" title="Listed Orders"></iframe>
+    <br>
+    <a href="/login">Logout</a>
+
+    <!-- Deliverer Buttons -->
+
+
+    <footer>
+        <p>© ROSSBAY 2024</p>
+    </footer>
+</body>
+</html>
